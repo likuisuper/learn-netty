@@ -30,7 +30,7 @@ public class ServerSocketChannelTest {
         ByteBuffer buffer=ByteBuffer.allocate(1024);
         //4、读取客服端发来的消息，如果没有则阻塞
         socketChannel.read(buffer);
-        //read就相当于往buffer中put数据，所以一定要flip，让position重新从0开始，flip常用于put之后，至于为什么？想想就明白了
+        //read就是读取客户端的数据写入到buffer中，底层调用的是buffer的put方法，所以一定要flip，让position重新从0开始，flip常用于put之后，至于为什么？想想就明白了
         buffer.flip();
         byte[] bytes=new byte[buffer.remaining()];
         //将缓冲区的数据读取到字节数组
@@ -40,7 +40,7 @@ public class ServerSocketChannelTest {
         //5、回写消息
         //上面调用了buffer的get方法，所以在调用write之前要先调用rewind，rewind常用于write或get之前
         buffer.rewind();
-        //write就相当于从buffer中get数据
+        //write就是将服务端的数据写入到buffer中
         socketChannel.write(buffer);
         //6、关闭管道
         socketChannel.close();
@@ -76,7 +76,7 @@ public class ServerSocketChannelTest {
             //5、回写消息
             //上面调用了buffer的get方法，所以在调用write之前要先调用rewind，rewind常用于write或get之前
             buffer.rewind();
-            //write就相当于从buffer中get数据
+            //write就是将服务端的数据写入到buffer中
             socketChannel.write(buffer);
             if(message.trim().equals("q")){
                 break;
@@ -114,6 +114,8 @@ public class ServerSocketChannelTest {
 //        Selector selector=Selector.open();
 //        //选择器会监听当前的read操作，当数据读取好了之后，再通知管道
 //        //只有继承了SelectableChannel的类才能register
+          //将管道注册到选择器之前，必须设置管道为非阻塞模式
+//          socketChannel.configureBlocking(false);
 //        socketChannel.register(selector, SelectionKey.OP_READ);//非阻塞
         //tomcat的BIO模型采用线程池分配线程，这里直接new线程
         Thread thread=new Thread(()->{
@@ -134,7 +136,7 @@ public class ServerSocketChannelTest {
                     //5、回写消息
                     //上面调用了buffer的get方法，所以在调用write之前要先调用rewind，rewind常用于write或get之前
                     buffer.rewind();
-                    //write就相当于从buffer中get数据
+                    //write就是将服务端的数据写入到buffer中
                     socketChannel.write(buffer);
                     if(message.trim().equals("q")){
                         break;
