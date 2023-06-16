@@ -97,7 +97,7 @@ public class DataGramChannelTest {
         //将管道注册到选择器，关注的事件为read操作
         channel.register(selector, SelectionKey.OP_READ);
         while (true){
-            //select刷新键集，它是阻塞的，知道有关注的事件进来，这里是READ事件
+            //select刷新键集，它是阻塞的，直到有关注的事件进来，这里是READ事件
             int count = selector.select();
             if(count>0){
                //表示有指定的数量的键状态发生了变更
@@ -105,6 +105,8 @@ public class DataGramChannelTest {
                 while (iterator.hasNext()){
                     SelectionKey selectionKey = iterator.next();
                     handler(selectionKey);
+                    //移除，防止进行重复处理
+                    iterator.remove();
                 }
             }
         }
